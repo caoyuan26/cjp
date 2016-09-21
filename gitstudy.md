@@ -122,8 +122,8 @@ $ git commit -m "add 2 files."
 **说明:** 
 
 git add 告诉 git 我要加入某个文件, git commit告诉 git 内容可以放入版本库了, git commit后的 -m ‘xxx’ 参数的意思是这次提交做了哪些改动, 强烈建议写上, 因为用不了多久你就会忘了曾经做了什么. 因为git commit 一次可以提交多个文件, 所以可以先通过add多个文件, 然后commit一次提交.
-
 git add 告诉 git 我要加入某个文件, git commit告诉 git 内容可以放入版本库了, git commit后的 -m ‘xxx’ 参数的意思是这次提交做了哪些改动, 强烈建议写上, 因为用不了多久你就会忘了曾经做了什么. 因为git commit 一次可以提交多个文件, 所以可以先通过add多个文件, 然后commit一次提交.
+
 
 ###时光机穿梭
 
@@ -480,3 +480,348 @@ yuan@yuan:~/learngit$ rm test.txt
 
    	2、只要提交到版本库不用提心误删除，但只能恢复最版本。
 
+##添加远程库
+
+1、创建本地Git仓库，GitHub创建一个Git仓库
+
+2、让本地仓库与远程仓库进行远程同步，可以作为备份
+
+3、登录GitHub右上角Create a new repo创建一个新库
+
+Respository name 填learngit 点击Create repository
+
+4、本地库与远程库关联
+
+```
+yuan@yuan:~/learngit$ git remote add origin 2675142924@qq.com:michaelliao/learngit.git
+```
+5、本地所有内容添加到远程库上
+```
+yuan@yuan:~/learngit$ git push -u origin master
+```
+用git push命令，实际上是把当前分支master推送到远程
+
+第一次推送master加上-u参数
+
+本地master分支内容添加到远程新的master分支内容
+还会把本地的master分支与远程master分支关联起来，方便以后推送
+
+以后推送就可以通过以下命令
+ ```
+	 git push origin master
+ ```
+	第一次使用Git的clone或者push命令连接GitHub时会有警告
+
+```
+The authenticity of host 'github.com (xx.xx.xx.xx)' can't be established.
+RSA key fingerprint is xx.xx.xx.xx.xx.
+Are you sure you want to continue connecting (yes/no)?
+```
+提示确认GitHub的Key的指纹信服务息是否真的来自GitHub服务器,输入Yes即可
+
+```
+Warning: Permanently added 'github.com' (RSA) to the list of known hosts.
+```
+
+	**警告出现一次，后面的操作就不会有任何警告了
+
+总结；
+ 1、关联远程库使用命令
+```
+git remote add origin 2675142924@qq.com:path/repo-name.git
+```
+ 2、第一次推送分支所有内容：git push -u origin master
+
+ 3、以后每次提次只需输入命令:git push origin master 推送最新修改
+
+##远程仓库
+
+1、时光穿梭可恢复历史版本
+
+2、git分布式版本控制系统
+
+同一个Git仓库，可以分布到不同的机器上。
+
+从版本库机器上克隆原始版本库，每台机器都一样
+
+3、通过一台电脑玩远程库
+一台电脑上可以克隆多个版本库，只要不在同一个目录下
+
+4、多台电脑玩远程库
+
+一台电脑当服务器用，其它的电脑从服务器中克隆一份到电脑上，并把各自的提交到服务器仓库，也
+
+可从服务器拉取最新版本
+
+5、GitHub网站提供版本托管服务
+只要注册一个GitHub帐号，就可免费获得Git远程仓库,GitHub通过SSH加密传输
+			
+第一步：创建SSH Key
+
+	查看用户主目录下是否有.ssh目录，有再看看有没有id_rsa和id_rsa.pub这两个文件如果有跳过
+
+	没有就创建SSH Key,执行完.ssh目录下生成 id_rsa和id_rsa.pub两个密钥文件，
+
+id_rsa私钥，不可泄露，id_rsa.pub是公钥可以告诉别人
+```
+ssh-keygen -t rsa -C "2675142924@qq.com"  //更换自己的邮件地址
+```
+
+第2步：登陆GitHub，打开“Account settings”，“SSH Keys”页面：
+
+然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容：
+点“Add Key”，你就应该看到已经添加的Key：
+
+总结：
+
+1、Github 有公钥就可以确认只有你自己推送
+
+2、允许添加多个key，多台电脑，只要把每台要访问的电脑都加到GitHub中，就可以每台推送到Github中
+
+3、GitHub免费托管的Git仓库，任何人都可以看到，但只有自己可以修改，所以重要信息不能放进去
+
+4、如果不想让别人看到放在GitHub中第一交点钱，把公开的变成私有的，别人就看不见了，再一个就是自己
+
+ 搭建一个Git服务器，自己的服务器别人就看不到
+
+
+##分支管理策略
+
+合并分支时，Git会用Fast forwards模式，这种模式，删除分支后会丢掉信息
+
+强制禁用Fast forward模式,Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息
+
+--no--ff方式的git merge
+
+####1、创建并切换dev分支：
+
+```
+yuan@yuan:~/learngit$ git checkout -b dev
+Switched to a new branch 'dev'
+```
+
+####2、修改readme.txt，提交一个新的add commit
+
+```
+yuan@yuan:~/learngit$ git add readme.txt
+yuan@yuan:~/learngit$ git commit -m "add merge"
+[dev 2a0f55c] add merge
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+```
+####3、切换回master分支
+
+```
+yuan@yuan:~/learngit$ git branch
+* dev
+  master
+yuan@yuan:~/learngit$ git checkout master
+Switched to branch 'master'
+yuan@yuan:~/learngit$ git branch
+  dev
+* master
+```
+
+####4、合并dev分支，请注意--no-ff参数，表示禁用Fast forward:
+
+```
+yuan@yuan:~/learngit$ git merge --no-ff -m "merge with no-ff" dev
+Merge made by the 'recursive' strategy.
+ readme.txt | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+```
+
+####因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去。
+
+####5、查看分支历史git log：
+
+```
+yuan@yuan:~/learngit$ git log --graph --pretty=oneline --abbrev-commit  //查看分支
+
+*   f384b35 merge with no-ff
+|\  
+| * 2a0f55c add merge
+|/  
+*   c65e7a0 conflict fixed
+|\  
+| * 71dbe9d AND simple
+* | 28d8785 & simple
+|/  
+* fc62eb2 brach test
+* 4c51d94 remove test.txt
+……
+```
+
+####可以看到，不使用Fast forward模式，merge后就像这样：
+
+####6、分支策略
+
+####管理分支原则
+
+master分支非常稳定，仅用来发布新版本，平时不在上面干活
+
+干活一般都在dev分支上，dev分支是不稳定的，到某个时候，比如1.0版本发布，再把dev分支合并到master上，在master分支发布1.0版本
+
+每个人都在dev分支上干活，每个人都可以有自己的分支，时不时地往dev分支上合并就可以了
+
+团队合作的支支看起来就像这样
+
+###总结
+
+1、合并分支时，加上--no-ff参数就可以用普通模式合并
+
+2、合并后的历史有分支，能看出来曾经做过合并
+
+3、fast forward合并就看不出来曾经做过合并。
+
+##Bug分支
+
+####开发中Bug修复办法
+
+```
+yuan@yuan:~/learngit$ git status
+On branch master
+nothing to commit, working directory clean
+```
+在Git中分支功能比较强大，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
+
+并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
+
+幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+
+```
+yuan@yuan:~/learngit$ git stash
+Saved working directory and index state WIP on dev: f384b35 merge with no-ff
+HEAD is now at f384b35 merge with no-ff
+```
+
+
+现在，用git status查看工作区，就是干净的（除非有没有被Git管理的文件），因此可以放心地创建分支来修复bug。
+
+首先确定要在哪个分支上修复bug，假定需要在master分支上修复，就从master创建临时分支：
+
+```
+$ git checkout master
+Switched to branch 'master'
+Your branch is ahead of 'origin/master' by 6 commits.
+$ git checkout -b issue-101
+Switched to a new branch 'issue-101'
+```
+
+现在修复bug，需要把“Git is free software ...”改为“Git is a free software ...”，然后提交：
+
+```
+yuan@yuan:~/learngit$ git commit -m "fix bug 101"
+On branch master
+nothing to commit, working directory clean
+
+yuan@yuan:~/learngit$ git commit -m "fix bug 101"
+[master 32614a1] fix bug 101
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+```
+
+修复完成后，切换到master分支，并完成合并，最后删除issue-101分支：
+
+```
+$ git checkout master
+Switched to branch 'master'
+Your branch is ahead of 'origin/master' by 2 commits.
+$ git merge --no-ff -m "merged bug fix 101" issue-101
+Merge made by the 'recursive' strategy.
+ readme.txt |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git branch -d issue-101
+Deleted branch issue-101 (was cc17032).
+```
+
+太棒了，原计划两个小时的bug修复只花了5分钟！现在，是时候接着回到dev分支干活了！
+
+```
+$ git checkout dev
+Switched to branch 'dev'
+$ git status
+# On branch dev
+nothing to commit (working directory clean)
+```
+
+工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：
+
+1、是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+
+2、另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+
+```
+yuan@yuan:~/learngit$ git stash pop
+On branch issue-101
+Changes not staged for commit:
+(use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (a3c15cae9ce0df80247abf06a3462f3d7a44a1d0)
+```
+
+3、再用git stash list查看，就看不到任何stash内容了
+
+```
+yuan@yuan:~/learngit$ git stash list
+```
+
+4、你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+
+```
+git stash apply stash@{0}
+```
+总结
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+##Feature分支
+
+软件开发中，总要不断添加进来,添加新功能时。
+
+你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+
+现在，你终于接到了一个新任务：开发代号为Vulcan的新功能，该功能计划用于下一代星际飞船。于是准备开发：
+```
+yuan@yuan:~/learngit$ git checkout -b feature-vulcan
+M	readme.txt
+Switched to a new branch 'feature-vulcan'
+```
+5分钟后，开发完毕：
+```
+yuan@yuan:~/learngit$ git add vulcan.py
+yuan@yuan:~/learngit$ git commit -m "add feature vulcan"
+[feature-vulcan afb809a] add feature vulcan
+ 1 file changed, 1 insertion(+)
+ create mode 100644 vulcan.py
+```
+
+切回dev
+###准备合并：
+```
+yuan@yuan:~/learngit$ git checkout dev
+```
+####feature分支和bug分支合并，然后删除。
+但是，
+就在此时，接到上级命令，因经费不足，新功能必须取消！
+虽然白干了，但是这个分支还是必须就地销毁：
+```
+yuan@yuan:~/learngit$ git branch -d feature-vulcan
+error: The branch 'feature-vulcan' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature-vulcan'.
+```
+销毁失败。Git友情提醒，feature-vulcan
+分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用命令git branch -D feature-vulcan
+。
+现在我们强行删除：
+```
+yuan@yuan:~/learngit$ git branch -d feature-vulcan
+error: The branch 'feature-vulcan' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature-vulcan'.
+```
+
+终于删除成功！
