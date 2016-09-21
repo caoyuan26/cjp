@@ -122,3 +122,361 @@ $ git commit -m "add 2 files."
 **说明:** 
 
 git add 告诉 git 我要加入某个文件, git commit告诉 git 内容可以放入版本库了, git commit后的 -m ‘xxx’ 参数的意思是这次提交做了哪些改动, 强烈建议写上, 因为用不了多久你就会忘了曾经做了什么. 因为git commit 一次可以提交多个文件, 所以可以先通过add多个文件, 然后commit一次提交.
+
+git add 告诉 git 我要加入某个文件, git commit告诉 git 内容可以放入版本库了, git commit后的 -m ‘xxx’ 参数的意思是这次提交做了哪些改动, 强烈建议写上, 因为用不了多久你就会忘了曾经做了什么. 因为git commit 一次可以提交多个文件, 所以可以先通过add多个文件, 然后commit一次提交.
+
+###时光机穿梭
+
+* 在终端使用命令git status查看那些文件被改动, 以及那些文件将要被commit提交
+
+* 在终端使用命令git diff查看文件被改动了什么
+
+版本回退
+
+如果在修改文件过程中出现了什么错误, 需要回退到就版本, 怎么办呢?
+
+在终端使用命令git log查看提交历史
+```
+commit f384b35e6c614ac5444efd0167e29fee66c9c37d
+Merge: c65e7a0 2a0f55c
+Author: caoyuan <2675142924@qq.com>
+Date:   Wed Sep 21 15:46:03 2016 +0800
+
+    merge with no-ff
+
+commit 2a0f55c64f68abb7cb69547063330821a3a0df39
+Author: caoyuan <2675142924@qq.com>
+Date:   Wed Sep 21 15:35:31 2016 +0800
+
+    add merge
+
+commit c65e7a0f684587adce36c2f972de7fb4ce53cd69
+Merge: 28d8785 71dbe9d
+Author: caoyuan <2675142924@qq.com>
+Date:   Wed Sep 21 14:58:04 2016 +0800
+
+```
+如果觉得内容太多, 可以使用命令git log --graph --pretty=oneline --abbrev-commit 查看
+```
+yuan@yuan:~/learngit$ git log --pretty=oneline --abbrev-commit
+f384b35 merge with no-ff
+2a0f55c add merge
+c65e7a0 conflict fixed
+28d8785 & simple
+71dbe9d AND simple
+fc62eb2 brach test
+4c51d94 remove test.txt
+1ee3747 add test.text
+5895409 add cao
+9a97047 git track changes
+440c6b3 understand how stage works
+5396aed append GPL
+21c867f add 3 file
+9c6ce9f add 1 file
+```
+**说明:** 
+前面的一大串数字是commit id, 和SVN不一样，Git的commit id不是1，2，3……递增的数字，而是一个SHA1计算出来的一个非常大的数字，用十六进制表示.
+
+上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+```
+yuan@yuan:~/learngit$ git reset --hard HEAD^
+HEAD is now at c65e7a0 conflict fixed
+```
+**注意:**
+ 要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+工作区和暂存区
+
+Git和其他版本控制系统如SVN的一个不同之处就是有暂存区的概念。
+
+工作区
+
+工作区可以简单的理解为是git仓库目录下内容.
+
+暂存区
+
+回顾一下, 在将内容提交到仓库时候, 需要先使用git add一下, 此时这个add其实是吧内容提交到stage暂存区, 在执行commit的使用才会将stage暂存区中的内容提交到工作区.
+
+git add命令将文件提交到缓存区
+![20160921133228815.jpg](http://upload-images.jianshu.io/upload_images/2665727-48cc6f11eb90f748.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+Git和其他版本控制系统如SVN的一个不同之处就是有暂存区的概念。
+
+先来看名词解释。
+
+##工作区（Working Directory）
+
+就是你在电脑里能看到的目录，比如我的learngit文件夹就是一个工作区：
+
+working-dir
+
+
+##版本库（Repository）
+
+工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+
+Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。
+
+**git-repo**
+
+分支和HEAD的概念我们以后再讲。
+
+前面讲了我们把文件往Git版本库里添加的时候，是分两步执行的：**
+
+第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区；
+
+第二步是用git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+
+**因为我们创建Git版本库时，Git自动为我们创建了唯一一个master分支，所以，现在，git commit就是往master分支上提交更改。**
+
+**你可以简单理解为，需要提交的文件修改通通放到暂存区，然后，一次性提交暂存区的所有修改。**
+
+**俗话说，实践出真知。现在，我们再练习一遍，先对readme.txt做个修改，比如加上一行内容：
+**
+```
+Git is a distributed version control system.
+Git is free software distributed under the GPL.
+Git has a mutable index called stage.
+```
+
+然后，在工作区新增一个LICENSE文本文件（内容随便写）。
+
+先用git status查看一下状态：
+```
+$ git status
+On branch master
+Changes not staged for commit:
+ (use "git add <file>..." to update what will be committed)
+(use "git checkout -- <file>..." to discard changes in working directory)
+
+   modified:   readme.txt
+
+ Untracked files:
+   (use "git add <file>..." to include in what will be committed)
+
+   LICENSE
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+Git非常清楚地告诉我们，readme.txt被修改了，而LICENSE还从来没有被添加过，所以它的状态是Untracked。
+
+现在，使用两次命令git add，把readme.txt和LICENSE都添加后，用git status再查看一下：
+```
+$ git status
+On branch master
+Changes to be committed:
+(use "git reset HEAD <file>..." to unstage)
+
+ new file:   LICENSE
+ modified:   readme.txt
+
+```
+现在，暂存区的状态就变成这样了：
+
+git-stage
+
+所以，git add命令实际上就是把要提交的所有修改放到暂存区（Stage），然后，执行git commit就可以一次性把暂存区的所有修改提交到分支。
+
+$ git commit -m "understand how stage works"
+[master 27c9860] understand how stage works
+ 2 files changed, 675 insertions(+)
+ create mode 100644 LICENSE
+
+一旦提交后，如果你又没有对工作区做任何修改，那么工作区就是“干净”的：
+
+$ git status
+# On branch master
+nothing to commit (working directory clean)
+
+现在版本库变成了这样，暂存区就没有任何内容了：
+
+git-stage-after-commit
+
+###小结
+
+**暂存区是Git非常重要的概念，弄明白了暂存区，就弄明白了Git的很多操作到底干了什么。**
+
+**没弄明白暂存区是怎么回事的童鞋，请向上滚动页面，再看一次。**
+
+###4.3git撤销修改
+
+  如果在reqdme.txt中多加了一行，在提交前，我们要撤销修改
+
+  删除添加的行，返回到上一个历史版本。
+
+  例1：
+```
+  yuan@yuan:~/learngit$ git status
+	On branch master
+	Changes not staged for commit:
+    (use "git add <file>..." to update what will be committed)
+    (use "git checkout -- <file>..." to discard changes in working directory)
+	modified:   readme.txt
+    no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+  执行git status后git会提醒git checkout -- file
+
+  git checkout -- file  可以丢弃工作区的修改
+
+  文件在工作区的修改全部撤销
+
+  修改后还没被放到暂存区
+
+  撤销修改就回到和版本库一模一样状态
+
+  修改后已经添加到暂存区
+
+又作了修改，现在，撤销修改就回到添加到暂存区后的状态
+```
+git commit  
+git add
+git checkout -- file 
+```
+命令中的 --的作用
+
+没用-- 就变成切换到另一分支命令
+
+git checkout命令
+
+在commit之前发现这个问题，git status 修改只是添加到了暂存区，还没有提交：
+
+	```
+	yuan@yuan:~/learngit$ vim readme.txt
+	Git is a distributed version control system.
+	Git is free software distributed under the GPL.
+	Git has a mutable index called stage.
+	Git tracks changes.
+	dddd cao yuan
+	i love you
+	```
+
+通过`git diff`可以看到里面添加了一个 I love you的内容
+
+```	
+	yuan@yuan:~/learngit$ git diff
+	diff --git a/readme.txt b/readme.txt
+	index 5d1ed32..fcb9573 100644
+	--- a/readme.txt
+	+++ b/readme.txt
+	@@ -3,3 +3,4 @@ Git is free software distributed under the GPL.
+	 Git has a mutable index called stage.
+	 Git tracks changes.
+	 dddd cao yuan
+	+i love you^M   //此行是添加的内容，可以看到前面有一个+号
+```
+2、我们现在把readme.txt添加到暂存区
+
+```
+	yuan@yuan:~/learngit$ git add readme.txt  //把readme.txt添加到暂存区
+	yuan@yuan:~/learngit$ git status          //查看状态
+	On branch master
+	Changes to be committed: 
+  	(use "git reset HEAD <file>..." to unstage) //提示撤销暂存区修改
+	modified:   readme.txt    				 //提示修改reqdme.txt
+
+	yuan@yuan:~/learngit$ git reset HEAD readme.txt //撤销暂存区修改，重新放回工作区
+	Unstaged changes after reset:
+	M	readme.txt
+```
+  
+###查看状态,当前已前暂存区回到的工作区
+
+```
+ yuan@yuan:~/learngit$ git status     //查看状态 
+	On branch master  
+	Changes not staged for commit:
+  	(use "git add <file>..." to update what will be committed)
+  	(use "git checkout -- <file>..." to discard changes in working directory)
+	modified:   readme.txt
+	no changes added to commit (use "git add" and/or "git commit -a") //
+```
+
+###再从工作区撤销命令，看到结果中没有i love you字母了
+
+```
+	yuan@yuan:~/learngit$ git checkout -- readme.txt   //撤销工作区修改
+	yuan@yuan:~/learngit$ cat readme.txt               //查看readme.txt
+	Git is a distributed version control system.
+	Git is free software distributed under the GPL.
+	Git has a mutable index called stage.
+	Git tracks changes.
+	cao                                           
+
+```
+
+3、如果从暂存区提交到了版本库，只能用前面讲到的版本回退操作
+	
+	前提是没有把本地版本库推送到远程，否则无法撤销。
+
+总结；
+
+1、修改内容有误时了，但没有提交到暂存区 直接使用 git checkout -- file
+
+2、修改某文件内容有误后，提交到暂存区想撤销修改分如下2步
+
+	   第一步: 先让文件回到工作区  git rest HEAD file
+
+	   第二步：从工作区撤销修改  git checkout -- file
+
+3、已经提交了修改内容到版本库时，想要撤销本次提交只能用版本回退，前提没有推送到远程库
+
+##删除文件
+
+1、添加一个test.txt新文件
+
+	```
+	yuan@yuan:~/learngit$ vim test.txt
+	yuan@yuan:~/learngit$ ls      //ls查看到当前目录下多了一个test.txt文件
+	LICENSE.txt  readme.txt  test.txt
+	```
+2、把test文件提交到暂存区
+
+	```
+	yuan@yuan:~/learngit$ git add test.txt               //把test添加到暂存区
+	yuan@yuan:~/learngit$ git commit -m "add test.text"  //把test添加到本地库
+	[master 1ee3747] add test.text
+	 1 file changed, 0 insertions(+), 0 deletions(-)
+	 create mode 100644 test.txt
+	```
+3、删除test.txt文件
+
+```
+yuan@yuan:~/learngit$ rm test.txt
+```
+
+删除后Git知道你删除了文件，因此，工作区和版本库就不一致了
+
+ 4、git status查看状态
+
+ ```
+	 yuan@yuan:~/learngit$ git status
+	 On branch master
+	 Changes not staged for commit:
+	 (use "git add/rm <file>..." to update what will be committed)
+	 (use "git checkout -- <file>..." to discard changes in working directory)
+	 deleted:    test.txt                        //提示文件被删除
+	 no changes added to commit (use "git add" and/or "git commit -a")
+```
+5、是否确认删除文件
+
+如果删除文件执行git rm test.txt 删掉，并且git commit
+
+ ```
+	 yuan@yuan:~/learngit$ git rm test.txt
+	rm 'test.txt'
+	yuan@yuan:~/learngit$ git commit -m "remove test.txt"
+	[master 4c51d94] remove test.txt
+	 1 file changed, 0 insertions(+), 0 deletions(-)
+	 delete mode 100644 test.txt
+```
+
+如果不小心删错了用git checkout -- test.txt 就可以找回来
+
+    git checkout用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原”。
+
+总结：
+  
+   	1、执行git rm file 删除文件
+
+   	2、只要提交到版本库不用提心误删除，但只能恢复最版本。
+
